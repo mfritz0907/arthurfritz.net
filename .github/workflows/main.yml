@@ -3,7 +3,8 @@ name: Deploy to IONOS SFTP
 on:
   push:
     branches:
-      - main   # or master — adjust if necessary
+      - work
+      - main   # keep main for future compatibility
 
 jobs:
   deploy:
