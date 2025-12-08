@@ -567,8 +567,38 @@
       previewTimeout = setTimeout(hidePreview, 3000);
     }
 
+    const infoAnchors = anchors.filter((anchor) => anchor.closest('.district'));
+
+    function stopAutoTour() {
+      clearTimeout(autoTourTimeout);
+      autoTourTimeout = null;
+    }
+
+    function startAutoTour(initialDelay = 800) {
+      stopAutoTour();
+      if (!infoAnchors.length) return;
+
+      autoIndex = 0;
+
+      const visitNext = () => {
+        const anchor = infoAnchors[autoIndex % infoAnchors.length];
+        showPreview(anchor);
+
+        autoTourTimeout = setTimeout(() => {
+          hidePreview();
+          autoIndex += 1;
+          autoTourTimeout = setTimeout(visitNext, 450);
+        }, 3200);
+      };
+
+      autoTourTimeout = setTimeout(visitNext, initialDelay);
+    }
+
     anchors.forEach((anchor) => {
-      const handlePointerEnter = () => showPreview(anchor);
+      const handlePointerEnter = () => {
+        stopAutoTour();
+        showPreview(anchor);
+      };
       const handlePointerMove = () => {
         positionLittleMan(anchor);
         positionPreview(anchor);
@@ -576,6 +606,7 @@
       const handlePointerLeave = () => {
         clearTimeout(previewTimeout);
         hidePreview();
+        startAutoTour(1400);
       };
 
       anchor.addEventListener('pointerenter', handlePointerEnter);
@@ -585,7 +616,7 @@
       anchor.addEventListener('blur', handlePointerLeave);
     });
 
-    scheduleAutoTour(800);
+    startAutoTour(800);
   </script>
 </body>
 </html>
