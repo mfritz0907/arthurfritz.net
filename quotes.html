@@ -143,20 +143,55 @@
       {
         text: "Culture is who we are and what shapes our identity. No development can be sustainable without it.",
         url: "https://www.unesco.org/en/culture-and-sustainable-development"
+      },
+      {
+        text: "Science is our great ally in the quest for peace, sustainable development and human dignity.",
+        url: "https://www.unesco.org/en/natural-sciences"
+      },
+      {
+        text: "Knowledge shared freely accelerates innovation and narrows inequalities.",
+        url: "https://www.unesco.org/en/open-science"
+      },
+      {
+        text: "Preserving cultural heritage strengthens community identity and fosters mutual respect.",
+        url: "https://www.unesco.org/en/world-heritage"
+      },
+      {
+        text: "Education empowers individuals to transform their own lives and the societies around them.",
+        url: "https://www.unesco.org/en/education/sdg4"
+      },
+      {
+        text: "Media and information literacy equips people to navigate the digital world with confidence and ethics.",
+        url: "https://www.unesco.org/en/media-information-literacy"
       }
     ];
 
     const quoteEl = document.getElementById("quote");
     const sourceEl = document.getElementById("source");
 
-    function showRandomQuote() {
-      const choice = quotes[Math.floor(Math.random() * quotes.length)];
+    function shuffle(list) {
+      const copy = [...list];
+      for (let i = copy.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    let queue = shuffle(quotes);
+
+    function showNextQuote() {
+      if (queue.length === 0) {
+        queue = shuffle(quotes);
+      }
+
+      const choice = queue.shift();
       quoteEl.textContent = choice.text;
       sourceEl.innerHTML = `Source: <a href="${choice.url}" target="_blank" rel="noopener">${new URL(choice.url).host}</a>`;
     }
 
-    showRandomQuote();
-    setInterval(showRandomQuote, 10000);
+    showNextQuote();
+    setInterval(showNextQuote, 10000);
   </script>
 </body>
 </html>
