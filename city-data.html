@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NYC 311 Visual</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="city-data-page">
+  <header class="site-header container">
+    <p class="eyebrow">Live city data</p>
+    <h1>How New York City asks for help</h1>
+    <p class="lead">This diagram uses open 311 data from New York City to show which boroughs log the most service requests.</p>
+    <div class="action-row">
+      <a class="button" href="index.html">← Back home</a>
+      <span class="badge" id="status">Loading NYC open data…</span>
+    </div>
+  </header>
+
+  <main class="container grid">
+    <section class="card chart-card" aria-live="polite" aria-atomic="true">
+      <div class="chart-header">
+        <div>
+          <p class="eyebrow">311 Requests by borough</p>
+          <h2>Who dials in the most?</h2>
+          <p class="status" id="description">Waiting for a response from the NYC Open Data API.</p>
+        </div>
+        <div class="legend">
+          <span class="legend-badge gradient">Live counts</span>
+          <span class="legend-badge muted">Five boroughs</span>
+        </div>
+      </div>
+
+      <div id="chart" class="bar-chart" role="img" aria-label="Bar chart of 311 requests by borough."></div>
+      <p class="status" id="note">Bars grow dynamically once live data arrives.</p>
+    </section>
+
+    <section class="card">
+      <h2>What the API shows</h2>
+      <ul class="list" id="highlights">
+        <li>We are looking up the five boroughs directly from NYC Open Data.</li>
+        <li>Counts represent the live number of 311 requests recorded in the database.</li>
+        <li>The chart animates to make the comparison easy to read.</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="footer">
+    Data provided by <a href="https://data.cityofnewyork.us/" target="_blank" rel="noopener">NYC Open Data</a> via the 311 service request endpoint.
+  </footer>
+
+  <script>
+    const statusEl = document.getElementById('status');
+    const descriptionEl = document.getElementById('description');
+    const chartEl = document.getElementById('chart');
+    const noteEl = document.getElementById('note');
+    const highlightsEl = document.getElementById('highlights');
+
+    function createBar(name, value, max) {
+      const percent = Math.round((value / max) * 100);
+      const bar = document.createElement('div');
+      bar.className = 'bar';
+      bar.setAttribute('role', 'group');
+      bar.setAttribute('aria-label', `${name} has ${value.toLocaleString()} requests`);
+
+      const label = document.createElement('span');
+      label.className = 'bar-label';
+      label.textContent = name;
+
+      const fill = document.createElement('div');
+      fill.className = 'bar-fill';
+      fill.style.setProperty('--target-width', `${percent}%`);
+      fill.innerHTML = `<span class="bar-value">${value.toLocaleString()}</span>`;
+
+      bar.append(label, fill);
+      return bar;
+    }
+
+    function renderChart(items) {
+      chartEl.innerHTML = '';
+      const max = Math.max(...items.map((item) => item.count));
+      items.forEach((item, index) => {
+        const bar = createBar(item.borough, item.count, max);
+        bar.style.setProperty('--delay', `${index * 80}ms`);
+        chartEl.appendChild(bar);
+      });
+      noteEl.textContent = 'Live NYC data loaded. Hover to see exact counts.';
+    }
+
+    function renderHighlights(items) {
+      highlightsEl.innerHTML = '';
+      items.forEach((item) => {
+        const li = document.createElement('li');
+        li.innerHTML = `<strong>${item.borough}:</strong> ${item.count.toLocaleString()} active 311 requests.`;
+        highlightsEl.appendChild(li);
+      });
+    }
+
+    async function loadNYCData() {
+      statusEl.textContent = 'Contacting NYC servers…';
+      const endpoint =
+        'https://data.cityofnewyork.us/resource/erm2-nwe9.json?$select=borough,count(*)&$group=borough&$order=count%20DESC';
+
+      try {
+        const response = await fetch(endpoint);
+        if (!response.ok) throw new Error(`Request failed with ${response.status}`);
+        const data = await response.json();
+        const cleaned = data
+          .filter((row) => row.borough && row['count'])
+          .map((row) => ({ borough: row.borough, count: Number(row['count']) }))
+          .sort((a, b) => b.count - a.count);
+
+        if (!cleaned.length) throw new Error('Empty response');
+
+        renderChart(cleaned);
+        renderHighlights(cleaned);
+        statusEl.textContent = 'Live NYC data displayed.';
+        descriptionEl.textContent = 'Each bar represents the current number of 311 service requests per borough.';
+      } catch (error) {
+        const fallback = [
+          { borough: 'Brooklyn', count: 420000 },
+          { borough: 'Queens', count: 380000 },
+          { borough: 'Manhattan', count: 310000 },
+          { borough: 'Bronx', count: 250000 },
+          { borough: 'Staten Island', count: 70000 },
+        ];
+        renderChart(fallback);
+        renderHighlights(fallback);
+        statusEl.textContent = 'Showing sample data due to a network issue.';
+        descriptionEl.textContent = 'Live data could not be reached, so an example set is shown instead.';
+        noteEl.textContent = 'Check your connection and refresh to see the live numbers.';
+      }
+    }
+
+    loadNYCData();
+  </script>
+</body>
+</html>
