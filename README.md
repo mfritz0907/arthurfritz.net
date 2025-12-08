@@ -1,10 +1,9 @@
 # arthurfritz.net
-Coding mit Arthur
-Test fuer Aenderung MF
-Meine ersten Teständerungen
-UND WIEDER PAPA
-und noch
-und wiedet af
+
+A lightweight personal page with a single focus: daily inspiration and a clean layout.
+
+- **Homepage:** simple introduction with a quick link to the quotes.
+- **Quotes:** shows a new quote every day, with a live feed and offline fallback list.
 
 ## Deployment
 
@@ -17,6 +16,3 @@ Deployments run automatically via the GitHub Actions workflow in `.github/workfl
 3. Once the job succeeds, refresh the site (hard refresh with Ctrl+F5) to bypass cached assets.
 
 No manual upload is needed—the workflow handles publishing to the configured webspace automatically.
-
-## Animated flower demo
-Open `index.html` in any browser to see a lightweight animated flower built with pure HTML and CSS. The design keeps markup and animations simple so it runs smoothly even on weak computers.
