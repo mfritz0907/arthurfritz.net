@@ -14,6 +14,7 @@
     <div class="action-row">
       <a class="button" href="index.html">← Back home</a>
       <span class="badge" id="status">Loading NYC open data…</span>
+      <span class="badge pulse" id="live-indicator" aria-live="polite">Live refresh</span>
     </div>
   </header>
 
@@ -33,6 +34,7 @@
 
       <div id="chart" class="bar-chart" role="img" aria-label="Bar chart of 311 requests by borough."></div>
       <p class="status" id="note">Bars grow dynamically once live data arrives.</p>
+      <p class="status" id="refresh-note">Auto-refreshing every 15 seconds. Next refresh in <strong id="countdown">15s</strong>. Last update at <strong id="updated-at">—</strong>.</p>
     </section>
 
     <section class="card">
@@ -54,7 +56,14 @@
     const descriptionEl = document.getElementById('description');
     const chartEl = document.getElementById('chart');
     const noteEl = document.getElementById('note');
+    const countdownEl = document.getElementById('countdown');
+    const updatedAtEl = document.getElementById('updated-at');
+    const liveIndicatorEl = document.getElementById('live-indicator');
     const highlightsEl = document.getElementById('highlights');
+    const REFRESH_MS = 15000;
+    let refreshTimer;
+    let countdownTimer;
+    let previousCounts = new Map();
 
     function createBar(name, value, max) {
       const percent = Math.round((value / max) * 100);
@@ -62,6 +71,7 @@
       bar.className = 'bar';
       bar.setAttribute('role', 'group');
       bar.setAttribute('aria-label', `${name} has ${value.toLocaleString()} requests`);
+      bar.dataset.borough = name;
 
       const label = document.createElement('span');
       label.className = 'bar-label';
@@ -70,6 +80,7 @@
       const fill = document.createElement('div');
       fill.className = 'bar-fill';
       fill.style.setProperty('--target-width', `${percent}%`);
+      fill.dataset.count = value;
       fill.innerHTML = `<span class="bar-value">${value.toLocaleString()}</span>`;
 
       bar.append(label, fill);
@@ -79,12 +90,21 @@
     function renderChart(items) {
       chartEl.innerHTML = '';
       const max = Math.max(...items.map((item) => item.count));
+
       items.forEach((item, index) => {
         const bar = createBar(item.borough, item.count, max);
+        const previousValue = previousCounts.get(item.borough);
+
+        if (previousValue !== undefined && previousValue !== item.count) {
+          bar.classList.add('bar-updated');
+        }
+
         bar.style.setProperty('--delay', `${index * 80}ms`);
         chartEl.appendChild(bar);
       });
-      noteEl.textContent = 'Live NYC data loaded. Hover to see exact counts.';
+
+      previousCounts = new Map(items.map((item) => [item.borough, item.count]));
+      noteEl.textContent = 'Live NYC data loaded. Bars pulse when counts change between refreshes.';
     }
 
     function renderHighlights(items) {
@@ -94,6 +114,37 @@
         li.innerHTML = `<strong>${item.borough}:</strong> ${item.count.toLocaleString()} active 311 requests.`;
         highlightsEl.appendChild(li);
       });
+    }
+
+    function startCountdown() {
+      clearInterval(countdownTimer);
+      liveIndicatorEl.classList.add('pulse-active');
+      let remaining = REFRESH_MS / 1000;
+      countdownEl.textContent = `${remaining}s`;
+
+      countdownTimer = setInterval(() => {
+        remaining -= 1;
+        if (remaining <= 0) {
+          countdownEl.textContent = '0s';
+          clearInterval(countdownTimer);
+          return;
+        }
+        countdownEl.textContent = `${remaining}s`;
+      }, 1000);
+    }
+
+    function markUpdatedTime() {
+      const now = new Date();
+      const formatted = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      updatedAtEl.textContent = formatted;
+    }
+
+    function scheduleRefresh() {
+      clearTimeout(refreshTimer);
+      startCountdown();
+      refreshTimer = setTimeout(() => {
+        loadNYCData();
+      }, REFRESH_MS);
     }
 
     async function loadNYCData() {
@@ -116,6 +167,8 @@
         renderHighlights(cleaned);
         statusEl.textContent = 'Live NYC data displayed.';
         descriptionEl.textContent = 'Each bar represents the current number of 311 service requests per borough.';
+        markUpdatedTime();
+        liveIndicatorEl.classList.remove('pulse-active');
       } catch (error) {
         const fallback = [
           { borough: 'Brooklyn', count: 420000 },
@@ -129,9 +182,14 @@
         statusEl.textContent = 'Showing sample data due to a network issue.';
         descriptionEl.textContent = 'Live data could not be reached, so an example set is shown instead.';
         noteEl.textContent = 'Check your connection and refresh to see the live numbers.';
+        liveIndicatorEl.classList.remove('pulse-active');
+        markUpdatedTime();
       }
+
+      scheduleRefresh();
     }
 
+    startCountdown();
     loadNYCData();
   </script>
 </body>

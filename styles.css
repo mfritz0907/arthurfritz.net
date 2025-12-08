@@ -155,6 +155,17 @@ p {
   border: 1px solid rgba(11, 94, 215, 0.2);
 }
 
+.badge.pulse {
+  box-shadow: 0 0 0 0 rgba(11, 94, 215, 0.25);
+  transition: box-shadow 200ms ease, background 200ms ease, color 200ms ease;
+}
+
+.badge.pulse.pulse-active {
+  animation: pulse-ring 1.2s ease-in-out infinite;
+  background: linear-gradient(135deg, rgba(11, 94, 215, 0.15), rgba(120, 81, 255, 0.18));
+  color: var(--accent-strong);
+}
+
 .footer {
   color: var(--muted);
   text-align: center;
@@ -289,6 +300,11 @@ p {
   overflow: hidden;
 }
 
+.bar.bar-updated {
+  border-color: rgba(120, 81, 255, 0.35);
+  animation: highlight 800ms ease;
+}
+
 .bar-label {
   font-weight: 800;
   color: var(--accent-strong);
@@ -342,6 +358,30 @@ p {
   }
   to {
     width: var(--target-width);
+  }
+}
+
+@keyframes highlight {
+  0% {
+    box-shadow: 0 0 0 0 rgba(120, 81, 255, 0.25);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgba(120, 81, 255, 0.05);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(120, 81, 255, 0);
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(11, 94, 215, 0.25);
+  }
+  60% {
+    box-shadow: 0 0 0 12px rgba(11, 94, 215, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(11, 94, 215, 0);
   }
 }
 
