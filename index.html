@@ -217,6 +217,7 @@
       animation: none;
       left: var(--man-x);
       top: var(--man-y);
+      transition: left 280ms ease, top 280ms ease, transform 280ms ease;
     }
 
     .little-man.is-manual .character {
@@ -528,6 +529,8 @@
     const linkPreview = document.querySelector('.link-preview');
     const anchors = Array.from(document.querySelectorAll('a[href]'));
     let previewTimeout;
+    let autoTourTimeout;
+    let autoIndex = 0;
 
     function positionLittleMan(target) {
       const rect = target.getBoundingClientRect();
@@ -581,6 +584,8 @@
       anchor.addEventListener('focus', handlePointerEnter);
       anchor.addEventListener('blur', handlePointerLeave);
     });
+
+    scheduleAutoTour(800);
   </script>
 </body>
 </html>
