@@ -5,6 +5,7 @@ on:
     branches:
       - work
       - main   # keep main for future compatibility
+      - master
 
 jobs:
   deploy:
