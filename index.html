@@ -567,21 +567,6 @@
       previewTimeout = setTimeout(hidePreview, 3000);
     }
 
-    function stopAutoTour() {
-      clearTimeout(autoTourTimeout);
-      autoTourTimeout = null;
-    }
-
-    function scheduleAutoTour(delay = 1200) {
-      stopAutoTour();
-      autoTourTimeout = setTimeout(() => {
-        const anchor = anchors[autoIndex % anchors.length];
-        autoIndex += 1;
-        showPreview(anchor);
-        scheduleAutoTour(1400);
-      }, delay);
-    }
-
     anchors.forEach((anchor) => {
       const handlePointerEnter = () => showPreview(anchor);
       const handlePointerMove = () => {
@@ -593,27 +578,11 @@
         hidePreview();
       };
 
-      anchor.addEventListener('pointerenter', () => {
-        stopAutoTour();
-        handlePointerEnter();
-      });
-
+      anchor.addEventListener('pointerenter', handlePointerEnter);
       anchor.addEventListener('pointermove', handlePointerMove);
-
-      anchor.addEventListener('pointerleave', () => {
-        handlePointerLeave();
-        scheduleAutoTour();
-      });
-
-      anchor.addEventListener('focus', () => {
-        stopAutoTour();
-        handlePointerEnter();
-      });
-
-      anchor.addEventListener('blur', () => {
-        handlePointerLeave();
-        scheduleAutoTour();
-      });
+      anchor.addEventListener('pointerleave', handlePointerLeave);
+      anchor.addEventListener('focus', handlePointerEnter);
+      anchor.addEventListener('blur', handlePointerLeave);
     });
 
     scheduleAutoTour(800);
