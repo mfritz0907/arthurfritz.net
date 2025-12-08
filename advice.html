@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Daily Advice</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header container">
+    <p class="eyebrow">Daily wisdom</p>
+    <h1>Advice to carry with you</h1>
+    <p class="lead">A single line of guidance, fetched fresh whenever you open the page.</p>
+    <div class="action-row">
+      <a class="button" href="index.html">← Back home</a>
+      <button class="button primary" id="refresh">Get new advice</button>
+      <span class="badge" id="status">Loading…</span>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card quote-box" aria-live="polite" aria-atomic="true">
+      <p id="advice" class="quote-text">Preparing something useful…</p>
+      <p id="advice-id" class="quote-meta"></p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    Advice provided by the public api.adviceslip.com service.
+  </footer>
+
+  <script>
+    const adviceEl = document.getElementById('advice');
+    const adviceIdEl = document.getElementById('advice-id');
+    const statusEl = document.getElementById('status');
+    const refreshBtn = document.getElementById('refresh');
+
+    async function loadAdvice() {
+      statusEl.textContent = 'Loading…';
+      adviceEl.textContent = 'Preparing something useful…';
+      adviceIdEl.textContent = '';
+      try {
+        const response = await fetch('https://api.adviceslip.com/advice', { cache: 'no-store' });
+        if (!response.ok) throw new Error(`Request failed with ${response.status}`);
+        const data = await response.json();
+        if (!data.slip) throw new Error('Missing advice');
+        adviceEl.textContent = `“${data.slip.advice}”`;
+        adviceIdEl.textContent = `Advice #${data.slip.id}`;
+        statusEl.textContent = 'Live advice';
+      } catch (error) {
+        statusEl.textContent = 'Unable to fetch advice right now.';
+        adviceEl.textContent = 'Take a short break, breathe deeply, and try again.';
+      }
+    }
+
+    refreshBtn.addEventListener('click', loadAdvice);
+    loadAdvice();
+  </script>
+</body>
+</html>
