@@ -137,6 +137,52 @@
       text-decoration: underline;
     }
 
+    .link-preview {
+      position: fixed;
+      transform: translate(-50%, -110%);
+      min-width: 240px;
+      max-width: min(360px, 90vw);
+      padding: 0.9rem 1rem;
+      border-radius: 12px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      color: var(--text);
+      display: none;
+      gap: 0.35rem;
+      z-index: 5;
+    }
+
+    .link-preview.visible {
+      display: grid;
+      animation: fade-in 200ms ease;
+    }
+
+    .link-preview strong {
+      font-size: 1.05rem;
+      letter-spacing: -0.01em;
+    }
+
+    .link-preview .url {
+      color: var(--muted);
+      font-size: 0.92rem;
+      word-break: break-word;
+    }
+
+    .link-preview .hint {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .link-preview .hint::before {
+      content: "\2197";
+      font-size: 1rem;
+      color: var(--accent);
+    }
+
     .little-man {
       position: fixed;
       inset: 0;
@@ -164,6 +210,21 @@
       transform-origin: center bottom;
       animation: roam 16s linear infinite;
       z-index: 1;
+    }
+
+    .little-man.is-manual .character,
+    .little-man.is-manual .shadow {
+      animation: none;
+      left: var(--man-x);
+      top: var(--man-y);
+    }
+
+    .little-man.is-manual .character {
+      transform: translate(-50%, -100%) scaleX(var(--man-direction, 1));
+    }
+
+    .little-man.is-manual .shadow {
+      transform: translate(-50%, -50%);
     }
 
     .little-man .head {
@@ -297,6 +358,17 @@
 
       .districts {
         grid-template-columns: 1fr;
+      }
+    }
+
+    @keyframes fade-in {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -120%);
+      }
+      to {
+        opacity: 1;
+        transform: translate(-50%, -110%);
       }
     }
   </style>
@@ -446,5 +518,54 @@
       </li>
     </ul>
   </main>
+  <div class="link-preview" role="status" aria-live="polite">
+    <strong></strong>
+    <span class="url"></span>
+    <span class="hint">Preview pops up for 3 seconds.</span>
+  </div>
+  <script>
+    const littleMan = document.querySelector('.little-man');
+    const linkPreview = document.querySelector('.link-preview');
+    const anchors = Array.from(document.querySelectorAll('a[href]'));
+    let previewTimeout;
+
+    function positionLittleMan(target) {
+      const rect = target.getBoundingClientRect();
+      const x = rect.left + rect.width / 2;
+      const y = rect.top + rect.height + 20;
+      const direction = x < window.innerWidth / 2 ? 1 : -1;
+      littleMan.style.setProperty('--man-x', `${x}px`);
+      littleMan.style.setProperty('--man-y', `${y}px`);
+      littleMan.style.setProperty('--man-direction', direction);
+      littleMan.classList.add('is-manual');
+    }
+
+    function positionPreview(target) {
+      const rect = target.getBoundingClientRect();
+      const x = rect.left + rect.width / 2;
+      const y = rect.top;
+      linkPreview.style.left = `${x}px`;
+      linkPreview.style.top = `${y}px`;
+    }
+
+    function showPreview(anchor) {
+      clearTimeout(previewTimeout);
+      positionLittleMan(anchor);
+      positionPreview(anchor);
+      linkPreview.querySelector('strong').textContent = anchor.textContent.trim() || anchor.href;
+      linkPreview.querySelector('.url').textContent = anchor.href;
+      linkPreview.classList.add('visible');
+
+      previewTimeout = setTimeout(() => {
+        linkPreview.classList.remove('visible');
+        littleMan.classList.remove('is-manual');
+      }, 3000);
+    }
+
+    anchors.forEach((anchor) => {
+      anchor.addEventListener('mouseenter', () => showPreview(anchor));
+      anchor.addEventListener('focus', () => showPreview(anchor));
+    });
+  </script>
 </body>
 </html>
