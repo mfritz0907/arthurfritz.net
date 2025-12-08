@@ -217,6 +217,7 @@
       animation: none;
       left: var(--man-x);
       top: var(--man-y);
+      transition: left 280ms ease, top 280ms ease, transform 280ms ease;
     }
 
     .little-man.is-manual .character {
@@ -528,6 +529,8 @@
     const linkPreview = document.querySelector('.link-preview');
     const anchors = Array.from(document.querySelectorAll('a[href]'));
     let previewTimeout;
+    let autoTourTimeout;
+    let autoIndex = 0;
 
     function positionLittleMan(target) {
       const rect = target.getBoundingClientRect();
@@ -548,6 +551,11 @@
       linkPreview.style.top = `${y}px`;
     }
 
+    function hidePreview() {
+      linkPreview.classList.remove('visible');
+      littleMan.classList.remove('is-manual');
+    }
+
     function showPreview(anchor) {
       clearTimeout(previewTimeout);
       positionLittleMan(anchor);
@@ -556,16 +564,59 @@
       linkPreview.querySelector('.url').textContent = anchor.href;
       linkPreview.classList.add('visible');
 
-      previewTimeout = setTimeout(() => {
-        linkPreview.classList.remove('visible');
-        littleMan.classList.remove('is-manual');
-      }, 3000);
+      previewTimeout = setTimeout(hidePreview, 3000);
+    }
+
+    function stopAutoTour() {
+      clearTimeout(autoTourTimeout);
+      autoTourTimeout = null;
+    }
+
+    function scheduleAutoTour(delay = 1200) {
+      stopAutoTour();
+      autoTourTimeout = setTimeout(() => {
+        const anchor = anchors[autoIndex % anchors.length];
+        autoIndex += 1;
+        showPreview(anchor);
+        scheduleAutoTour(1400);
+      }, delay);
     }
 
     anchors.forEach((anchor) => {
-      anchor.addEventListener('mouseenter', () => showPreview(anchor));
-      anchor.addEventListener('focus', () => showPreview(anchor));
+      const handlePointerEnter = () => showPreview(anchor);
+      const handlePointerMove = () => {
+        positionLittleMan(anchor);
+        positionPreview(anchor);
+      };
+      const handlePointerLeave = () => {
+        clearTimeout(previewTimeout);
+        hidePreview();
+      };
+
+      anchor.addEventListener('pointerenter', () => {
+        stopAutoTour();
+        handlePointerEnter();
+      });
+
+      anchor.addEventListener('pointermove', handlePointerMove);
+
+      anchor.addEventListener('pointerleave', () => {
+        handlePointerLeave();
+        scheduleAutoTour();
+      });
+
+      anchor.addEventListener('focus', () => {
+        stopAutoTour();
+        handlePointerEnter();
+      });
+
+      anchor.addEventListener('blur', () => {
+        handlePointerLeave();
+        scheduleAutoTour();
+      });
     });
+
+    scheduleAutoTour(800);
   </script>
 </body>
 </html>
