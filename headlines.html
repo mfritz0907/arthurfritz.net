@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Der Standard Headlines Cloud</title>
+  <title>UNESCO Austria Headlines Cloud</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -150,10 +150,10 @@
 <body>
   <main>
     <header>
-      <h1>Der Standard headlines, visualized</h1>
+      <h1>UNESCO Austria headlines, visualized</h1>
       <p class="lead">
-        This word cloud highlights the most common words appearing in today&rsquo;s Der Standard headlines.
-        Click the refresh button to pull the latest titles directly from <code>derstandard.at</code>.
+        This word cloud highlights the most common words appearing in today&rsquo;s UNESCO Austria headlines.
+        Click the refresh button to pull the latest titles directly from <code>unesco.at</code>.
       </p>
       <div class="controls">
         <button id="refresh">Refresh headlines</button>
@@ -181,7 +181,7 @@
       'der','die','das','und','oder','den','im','in','am','auf','mit','von','vor','für','nach','zu','aus','bei','als','ein','eine','ist','es','an','so','auch','wie','des','dem','noch','mehr','nur','schon','sich','wir','sie','er','ihr','sein','auf','ohne','aber','wegen'
     ]);
 
-    const feedUrl = 'https://www.unesco.at/feed.rss';
+    const feedUrl = 'https://unesco.at/feed.rss';
     const proxy = (url) => `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}`;
 
     function updateStatus(message, isError = false) {
@@ -265,7 +265,7 @@
 
     async function fetchHeadlines() {
       refreshBtn.disabled = true;
-      updateStatus('Loading latest headlines from derstandard.at …');
+      updateStatus('Loading latest headlines from unesco.at …');
       try {
         const response = await fetch(proxy(feedUrl));
         if (!response.ok) throw new Error(`Request failed with ${response.status}`);
