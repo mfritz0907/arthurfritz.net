@@ -548,6 +548,11 @@
       linkPreview.style.top = `${y}px`;
     }
 
+    function hidePreview() {
+      linkPreview.classList.remove('visible');
+      littleMan.classList.remove('is-manual');
+    }
+
     function showPreview(anchor) {
       clearTimeout(previewTimeout);
       positionLittleMan(anchor);
@@ -556,15 +561,25 @@
       linkPreview.querySelector('.url').textContent = anchor.href;
       linkPreview.classList.add('visible');
 
-      previewTimeout = setTimeout(() => {
-        linkPreview.classList.remove('visible');
-        littleMan.classList.remove('is-manual');
-      }, 3000);
+      previewTimeout = setTimeout(hidePreview, 3000);
     }
 
     anchors.forEach((anchor) => {
-      anchor.addEventListener('mouseenter', () => showPreview(anchor));
-      anchor.addEventListener('focus', () => showPreview(anchor));
+      const handlePointerEnter = () => showPreview(anchor);
+      const handlePointerMove = () => {
+        positionLittleMan(anchor);
+        positionPreview(anchor);
+      };
+      const handlePointerLeave = () => {
+        clearTimeout(previewTimeout);
+        hidePreview();
+      };
+
+      anchor.addEventListener('pointerenter', handlePointerEnter);
+      anchor.addEventListener('pointermove', handlePointerMove);
+      anchor.addEventListener('pointerleave', handlePointerLeave);
+      anchor.addEventListener('focus', handlePointerEnter);
+      anchor.addEventListener('blur', handlePointerLeave);
     });
   </script>
 </body>
