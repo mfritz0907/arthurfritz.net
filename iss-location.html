@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ISS Location</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="city-data-page">
+  <header class="site-header container">
+    <p class="eyebrow">Orbit watch</p>
+    <h1>International Space Station now</h1>
+    <p class="lead">Live telemetry from wheretheiss.at shows the station's coordinates, altitude, and speed.</p>
+    <div class="action-row">
+      <a class="button" href="index.html">← Back home</a>
+      <button class="button primary" id="refresh">Refresh location</button>
+      <span class="badge" id="status">Loading…</span>
+    </div>
+  </header>
+
+  <main class="container grid">
+    <section class="card chart-card" aria-live="polite" aria-atomic="true">
+      <div class="chart-header">
+        <div>
+          <h2>Position</h2>
+          <p class="lead">Real-time snapshot of the ISS trajectory.</p>
+        </div>
+        <div class="legend">
+          <span class="legend-badge gradient">Live orbital data</span>
+        </div>
+      </div>
+      <div class="bar-chart" id="metrics">
+        <div class="bar">
+          <div class="bar-label">Latitude</div>
+          <div class="bar-fill" id="lat-bar"><span class="bar-value" id="lat-value">—</span></div>
+        </div>
+        <div class="bar">
+          <div class="bar-label">Longitude</div>
+          <div class="bar-fill" id="lon-bar"><span class="bar-value" id="lon-value">—</span></div>
+        </div>
+        <div class="bar">
+          <div class="bar-label">Altitude</div>
+          <div class="bar-fill" id="alt-bar"><span class="bar-value" id="alt-value">—</span></div>
+        </div>
+        <div class="bar">
+          <div class="bar-label">Velocity</div>
+          <div class="bar-fill" id="vel-bar"><span class="bar-value" id="vel-value">—</span></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    Data is provided by wheretheiss.at with units in degrees, kilometers, and kilometers per hour.
+  </footer>
+
+  <script>
+    const statusEl = document.getElementById('status');
+    const latValue = document.getElementById('lat-value');
+    const lonValue = document.getElementById('lon-value');
+    const altValue = document.getElementById('alt-value');
+    const velValue = document.getElementById('vel-value');
+    const latBar = document.getElementById('lat-bar');
+    const lonBar = document.getElementById('lon-bar');
+    const altBar = document.getElementById('alt-bar');
+    const velBar = document.getElementById('vel-bar');
+    const refreshBtn = document.getElementById('refresh');
+
+    function format(value, unit) {
+      return `${value.toFixed(2)} ${unit}`;
+    }
+
+    function setBar(bar, value, maxRange) {
+      const percent = Math.min(Math.abs(value) / maxRange, 1) * 100;
+      bar.style.setProperty('--target-width', `${percent}%`);
+    }
+
+    async function loadIss() {
+      statusEl.textContent = 'Loading…';
+      latValue.textContent = '—';
+      lonValue.textContent = '—';
+      altValue.textContent = '—';
+      velValue.textContent = '—';
+      try {
+        const response = await fetch('https://api.wheretheiss.at/v1/satellites/25544');
+        if (!response.ok) throw new Error(`Request failed with ${response.status}`);
+        const data = await response.json();
+        const { latitude, longitude, altitude, velocity } = data;
+        latValue.textContent = format(latitude, '°');
+        lonValue.textContent = format(longitude, '°');
+        altValue.textContent = format(altitude, 'km');
+        velValue.textContent = format(velocity, 'km/h');
+
+        setBar(latBar, latitude, 90);
+        setBar(lonBar, longitude, 180);
+        setBar(altBar, altitude, 500);
+        setBar(velBar, velocity, 30000);
+
+        statusEl.textContent = 'Live ISS data';
+      } catch (error) {
+        statusEl.textContent = 'Unable to load ISS data.';
+      }
+    }
+
+    refreshBtn.addEventListener('click', loadIss);
+    loadIss();
+  </script>
+</body>
+</html>
