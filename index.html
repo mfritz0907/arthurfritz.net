@@ -39,8 +39,16 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      gap: 2.25rem;
+      max-width: 1100px;
+    }
+
+    .garden {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: 1.5rem;
-      max-width: 900px;
+      width: 100%;
+      align-items: center;
     }
 
     .flower {
@@ -96,6 +104,69 @@
       background: radial-gradient(circle at 30% 30%, #ffd8a8, #ffba6b 55%, #d06f26 80%);
       box-shadow: 0 0 30px rgba(255, 186, 107, 0.75);
       animation: pulse-core 5.6s ease-in-out infinite;
+    }
+
+    .geometric {
+      --size: min(52vmin, 420px);
+      --petals: 16;
+      --petal-1: #7dd3fc;
+      --petal-2: #38bdf8;
+      --bg-1: rgba(109, 219, 255, 0.08);
+      --bg-2: rgba(56, 189, 248, 0.18);
+      animation: slow-spin 18s linear infinite reverse;
+      background: radial-gradient(circle at 50% 50%, var(--bg-2), transparent 58%);
+      border-radius: 18%;
+      overflow: hidden;
+    }
+
+    .geometric .ring {
+      inset: 10%;
+      border-radius: 22%;
+      background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12), transparent 62%);
+      animation: pulse 8s ease-in-out infinite;
+    }
+
+    .geometric .petal {
+      width: 26%;
+      height: 26%;
+      transform-origin: 50% 50%;
+      transform: rotate(var(--turn)) translate(-50%, -50%) scale(0.92);
+      clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+      background: linear-gradient(145deg, var(--petal-1), var(--petal-2));
+      box-shadow: 0 0 22px rgba(56, 189, 248, 0.35);
+      animation: bloom-geo 3.6s ease-in-out infinite alternate;
+    }
+
+    .geometric .petal:nth-child(odd) {
+      filter: brightness(1.15);
+    }
+
+    .geometric .core {
+      width: 18%;
+      height: 18%;
+      background: radial-gradient(circle at 40% 40%, #e0f2fe, #bae6fd 55%, #0ea5e9 80%);
+      box-shadow: 0 0 28px rgba(14, 165, 233, 0.7);
+    }
+
+    .geometric .stem {
+      width: 12%;
+      height: 40%;
+      background: linear-gradient(180deg, #7ee0a7, #238d5f);
+    }
+
+    .geometric .leaf {
+      width: 42%;
+      background: linear-gradient(120deg, #55cf9a, #1b7d58);
+      border-radius: 10% 80% 60% 30%;
+      top: 70%;
+    }
+
+    .geometric .leaf.right {
+      transform: translate(-2%, -20%) rotate(14deg) scale(0.86);
+    }
+
+    .geometric .leaf.left {
+      transform: translate(-88%, -14%) rotate(-194deg) scale(0.86);
     }
 
     .stem {
@@ -187,32 +258,71 @@
         animation-duration: 10s;
       }
     }
+
+    @keyframes bloom-geo {
+      0% {
+        transform: rotate(var(--turn)) translate(-50%, -52%) scale(0.86);
+        opacity: 0.94;
+      }
+      100% {
+        transform: rotate(var(--turn)) translate(-50%, -48%) scale(1.05);
+        opacity: 1;
+      }
+    }
   </style>
 </head>
 <body>
   <main>
-    <section class="flower" aria-label="Animated flower made of softly spinning petals">
-      <div class="ring" aria-hidden="true"></div>
-      <div class="stem" aria-hidden="true"></div>
-      <div class="leaf left" aria-hidden="true"></div>
-      <div class="leaf right" aria-hidden="true"></div>
-      <div class="petal" style="--i: 0" aria-hidden="true"></div>
-      <div class="petal" style="--i: 1" aria-hidden="true"></div>
-      <div class="petal" style="--i: 2" aria-hidden="true"></div>
-      <div class="petal" style="--i: 3" aria-hidden="true"></div>
-      <div class="petal" style="--i: 4" aria-hidden="true"></div>
-      <div class="petal" style="--i: 5" aria-hidden="true"></div>
-      <div class="petal" style="--i: 6" aria-hidden="true"></div>
-      <div class="petal" style="--i: 7" aria-hidden="true"></div>
-      <div class="petal" style="--i: 8" aria-hidden="true"></div>
-      <div class="petal" style="--i: 9" aria-hidden="true"></div>
-      <div class="petal" style="--i: 10" aria-hidden="true"></div>
-      <div class="petal" style="--i: 11" aria-hidden="true"></div>
-      <div class="core" aria-hidden="true"></div>
-    </section>
+    <div class="garden">
+      <section class="flower" aria-label="Animated flower made of softly spinning petals">
+        <div class="ring" aria-hidden="true"></div>
+        <div class="stem" aria-hidden="true"></div>
+        <div class="leaf left" aria-hidden="true"></div>
+        <div class="leaf right" aria-hidden="true"></div>
+        <div class="petal" style="--i: 0" aria-hidden="true"></div>
+        <div class="petal" style="--i: 1" aria-hidden="true"></div>
+        <div class="petal" style="--i: 2" aria-hidden="true"></div>
+        <div class="petal" style="--i: 3" aria-hidden="true"></div>
+        <div class="petal" style="--i: 4" aria-hidden="true"></div>
+        <div class="petal" style="--i: 5" aria-hidden="true"></div>
+        <div class="petal" style="--i: 6" aria-hidden="true"></div>
+        <div class="petal" style="--i: 7" aria-hidden="true"></div>
+        <div class="petal" style="--i: 8" aria-hidden="true"></div>
+        <div class="petal" style="--i: 9" aria-hidden="true"></div>
+        <div class="petal" style="--i: 10" aria-hidden="true"></div>
+        <div class="petal" style="--i: 11" aria-hidden="true"></div>
+        <div class="core" aria-hidden="true"></div>
+      </section>
+
+      <section class="flower geometric" aria-label="Geometric flower with diamond petals and a stem">
+        <div class="ring" aria-hidden="true"></div>
+        <div class="stem" aria-hidden="true"></div>
+        <div class="leaf left" aria-hidden="true"></div>
+        <div class="leaf right" aria-hidden="true"></div>
+        <div class="petal" style="--i: 0" aria-hidden="true"></div>
+        <div class="petal" style="--i: 1" aria-hidden="true"></div>
+        <div class="petal" style="--i: 2" aria-hidden="true"></div>
+        <div class="petal" style="--i: 3" aria-hidden="true"></div>
+        <div class="petal" style="--i: 4" aria-hidden="true"></div>
+        <div class="petal" style="--i: 5" aria-hidden="true"></div>
+        <div class="petal" style="--i: 6" aria-hidden="true"></div>
+        <div class="petal" style="--i: 7" aria-hidden="true"></div>
+        <div class="petal" style="--i: 8" aria-hidden="true"></div>
+        <div class="petal" style="--i: 9" aria-hidden="true"></div>
+        <div class="petal" style="--i: 10" aria-hidden="true"></div>
+        <div class="petal" style="--i: 11" aria-hidden="true"></div>
+        <div class="petal" style="--i: 12" aria-hidden="true"></div>
+        <div class="petal" style="--i: 13" aria-hidden="true"></div>
+        <div class="petal" style="--i: 14" aria-hidden="true"></div>
+        <div class="petal" style="--i: 15" aria-hidden="true"></div>
+        <div class="core" aria-hidden="true"></div>
+      </section>
+    </div>
+
     <p class="caption">
-      A lightweight, GPU-friendly flower made from simple shapes and CSS animations. It runs in any modern browser, even on
-      <strong>weak computers</strong>, thanks to minimal markup and no JavaScript.
+      A lightweight, GPU-friendly flower made from simple shapes and CSS animations. It now includes a second, more geometric
+      bloom with diamond petals and its own stem while still running smoothly on <strong>weak computers</strong> thanks to
+      minimal markup and no JavaScript.
     </p>
   </main>
 </body>
