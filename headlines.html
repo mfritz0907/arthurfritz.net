@@ -182,7 +182,7 @@
     ]);
 
     const feedUrl = 'https://www.derstandard.at/rss';
-    const proxy = (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+    const proxy = (url) => `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}`;
 
     function updateStatus(message, isError = false) {
       statusEl.textContent = message;
@@ -196,8 +196,8 @@
         .trim();
     }
 
-    function extractHeadlineWords(xml) {
-      const titles = Array.from(xml.querySelectorAll('item > title')).map((title) => title.textContent || '');
+    function extractHeadlineWords(data) {
+      const titles = (data.items || []).map((item) => item.title || '');
       const words = [];
       titles.forEach((title) => {
         title.split(/\s+/).forEach((part) => {
@@ -269,9 +269,8 @@
       try {
         const response = await fetch(proxy(feedUrl));
         if (!response.ok) throw new Error(`Request failed with ${response.status}`);
-        const text = await response.text();
-        const xml = new window.DOMParser().parseFromString(text, 'text/xml');
-        const words = extractHeadlineWords(xml);
+        const json = await response.json();
+        const words = extractHeadlineWords(json);
         if (!words.length) throw new Error('No headlines found.');
         const counts = countWords(words);
         renderCloud(counts);
