@@ -146,27 +146,43 @@
       height: 18%;
       background: radial-gradient(circle at 40% 40%, #e0f2fe, #bae6fd 55%, #0ea5e9 80%);
       box-shadow: 0 0 28px rgba(14, 165, 233, 0.7);
+      clip-path: polygon(25% 5%, 75% 5%, 95% 50%, 75% 95%, 25% 95%, 5% 50%);
     }
 
     .geometric .stem {
-      width: 12%;
-      height: 40%;
+      width: 13%;
+      height: 42%;
       background: linear-gradient(180deg, #7ee0a7, #238d5f);
+      clip-path: polygon(42% 0, 58% 0, 70% 100%, 30% 100%);
+      position: relative;
+    }
+
+    .geometric .stem::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: -12%;
+      width: 62%;
+      height: 22%;
+      transform: translateX(-50%);
+      background: linear-gradient(145deg, #35c483, #1a7a56);
+      clip-path: polygon(50% 0, 94% 50%, 50% 100%, 6% 50%);
+      filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.35));
     }
 
     .geometric .leaf {
       width: 42%;
       background: linear-gradient(120deg, #55cf9a, #1b7d58);
-      border-radius: 10% 80% 60% 30%;
       top: 70%;
+      clip-path: polygon(0 50%, 30% 0, 100% 25%, 90% 75%, 30% 100%);
     }
 
     .geometric .leaf.right {
-      transform: translate(-2%, -20%) rotate(14deg) scale(0.86);
+      transform: translate(-8%, -20%) rotate(12deg) scale(0.9);
     }
 
     .geometric .leaf.left {
-      transform: translate(-88%, -14%) rotate(-194deg) scale(0.86);
+      transform: translate(-88%, -12%) rotate(-198deg) scale(0.9);
     }
 
     .stem {
