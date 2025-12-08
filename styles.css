@@ -190,3 +190,41 @@ p {
     grid-template-columns: 1fr;
   }
 }
+
+.temperature-card {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  align-items: center;
+}
+
+.temperature-reading {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.temperature-value {
+  font-size: clamp(2.5rem, 5vw, 3.5rem);
+  font-weight: 800;
+  margin: 0;
+}
+
+.temperature-label {
+  color: var(--muted);
+  font-weight: 700;
+  margin: 0;
+}
+
+.temperature-details {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.temperature-description {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.temperature-page .card {
+  transition: border-color 200ms ease;
+}
