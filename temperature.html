@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vienna Temperature</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="temperature-page">
+  <header class="site-header container">
+    <p class="eyebrow">Live weather</p>
+    <h1>Vienna feels like…</h1>
+    <p class="lead">This page fetches the current temperature in Vienna and adapts its colors to match the mood outside.</p>
+    <div class="action-row">
+      <a class="button" href="index.html">← Back home</a>
+      <span class="badge" id="status">Checking Vienna's weather…</span>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card temperature-card" aria-live="polite" aria-atomic="true">
+      <div class="temperature-reading">
+        <p class="temperature-value" id="temperature">--°C</p>
+        <p class="temperature-label">Current temperature</p>
+      </div>
+      <div class="temperature-details">
+        <p id="description" class="temperature-description">Awaiting the latest report from Vienna.</p>
+        <p class="status" id="hint">Colors adjust as the temperature warms or cools.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    Live weather from the Open-Meteo API for Vienna, Austria.
+  </footer>
+
+  <script>
+    const statusEl = document.getElementById('status');
+    const temperatureEl = document.getElementById('temperature');
+    const descriptionEl = document.getElementById('description');
+    const hintEl = document.getElementById('hint');
+    const root = document.documentElement;
+
+    function clamp(value, min, max) {
+      return Math.min(Math.max(value, min), max);
+    }
+
+    function temperatureColor(tempC) {
+      const min = -10;
+      const max = 35;
+      const ratio = clamp((tempC - min) / (max - min), 0, 1);
+      const hue = 210 - ratio * 170; // 210 (cool blue) to 40 (warm orange)
+      const lightness = 60 - ratio * 10; // Slightly darker for heat
+      return `hsl(${hue}, 85%, ${lightness}%)`;
+    }
+
+    function setTemperatureTheme(tempC) {
+      const color = temperatureColor(tempC);
+      root.style.setProperty('--bg', color);
+      document.body.style.background = `linear-gradient(135deg, ${color} 0%, #f9fbff 50%, #ffffff 100%)`;
+      document.querySelectorAll('.card').forEach((card) => {
+        card.style.borderColor = color;
+      });
+      hintEl.textContent = 'Background updates automatically based on Vienna\'s temperature.';
+    }
+
+    async function fetchViennaTemperature() {
+      statusEl.textContent = 'Fetching current conditions…';
+      try {
+        const url = 'https://api.open-meteo.com/v1/forecast?latitude=48.2082&longitude=16.3738&current_weather=true&timezone=auto';
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`Request failed with ${response.status}`);
+        const data = await response.json();
+        const temp = data?.current_weather?.temperature;
+        if (typeof temp !== 'number') throw new Error('Unexpected weather response');
+
+        temperatureEl.textContent = `${temp.toFixed(1)}°C`;
+        descriptionEl.textContent = `Vienna is currently ${temp.toFixed(1)}°C. Cooler temperatures shift the page towards blues, while warmer readings move it toward oranges.`;
+        statusEl.textContent = 'Live data loaded.';
+        setTemperatureTheme(temp);
+      } catch (error) {
+        temperatureEl.textContent = '--°C';
+        descriptionEl.textContent = 'We could not load the latest temperature. Please check your connection and try again.';
+        statusEl.textContent = 'Unable to fetch live weather.';
+        hintEl.textContent = 'The background stays neutral until live data is available.';
+      }
+    }
+
+    fetchViennaTemperature();
+  </script>
+</body>
+</html>
