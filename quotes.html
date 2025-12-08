@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UNESCO Quotes</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f1f6ff;
+      --panel: #ffffff;
+      --text: #1a213a;
+      --muted: #4f5670;
+      --accent: #0b5ed7;
+      --border: #d8e3ff;
+      --shadow: 0 12px 30px rgba(17, 24, 39, 0.12);
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 2.5rem 1.5rem 3rem;
+      background: radial-gradient(circle at 20% 15%, rgba(11, 94, 215, 0.08), transparent 32%),
+        radial-gradient(circle at 80% 12%, rgba(17, 24, 39, 0.05), transparent 28%),
+        linear-gradient(135deg, #f9fbff 0%, #e9f2ff 100%);
+      color: var(--text);
+    }
+
+    main {
+      width: min(900px, 100%);
+      background: var(--panel);
+      border-radius: 18px;
+      padding: clamp(1.5rem, 1.5vw, 2.25rem);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .title {
+      margin: 0;
+      font-size: clamp(1.75rem, 2vw, 2rem);
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 1rem;
+    }
+
+    .card {
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: linear-gradient(135deg, rgba(11, 94, 215, 0.04), rgba(11, 94, 215, 0.02));
+      padding: 1.5rem;
+    }
+
+    .quote {
+      color: var(--accent);
+      font-size: clamp(1.35rem, 2.2vw, 1.75rem);
+      font-weight: 800;
+      margin: 0 0 0.85rem;
+      line-height: 1.4;
+    }
+
+    .source {
+      margin: 0;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .source a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .source a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 600px) {
+      main {
+        padding: 1.25rem;
+      }
+
+      .quote {
+        font-size: 1.25rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <h1 class="title">UNESCO Voices</h1>
+        <p class="subtitle">A rotating selection of quotes from www.unesco.org</p>
+      </div>
+      <a href="index.html" aria-label="Back to homepage"
+        style="display:inline-flex;align-items:center;gap:0.35rem;padding:0.55rem 0.9rem;border-radius:10px;border:1px solid var(--border);color:var(--text);text-decoration:none;font-weight:700;">←
+        Home</a>
+    </header>
+
+    <div class="card" aria-live="polite" aria-atomic="true">
+      <p id="quote" class="quote">Loading UNESCO quotes…</p>
+      <p id="source" class="source"></p>
+    </div>
+  </main>
+
+  <script>
+    const quotes = [
+      {
+        text: "Since wars begin in the minds of men, it is in the minds of men that the defences of peace must be constructed.",
+        url: "https://www.unesco.org/en/legal-affairs/constitution"
+      },
+      {
+        text: "UNESCO seeks to build peace through international cooperation in education, the sciences and culture.",
+        url: "https://www.unesco.org/en/overview"
+      },
+      {
+        text: "Freedom of expression is a fundamental human right and a key enabler of all other rights.",
+        url: "https://www.unesco.org/en/free-speech"
+      },
+      {
+        text: "Education transforms lives and is at the heart of UNESCO’s mission to build peace, eradicate poverty and drive sustainable development.",
+        url: "https://www.unesco.org/en/education"
+      },
+      {
+        text: "Culture is who we are and what shapes our identity. No development can be sustainable without it.",
+        url: "https://www.unesco.org/en/culture-and-sustainable-development"
+      }
+    ];
+
+    const quoteEl = document.getElementById("quote");
+    const sourceEl = document.getElementById("source");
+
+    function showRandomQuote() {
+      const choice = quotes[Math.floor(Math.random() * quotes.length)];
+      quoteEl.textContent = choice.text;
+      sourceEl.innerHTML = `Source: <a href="${choice.url}" target="_blank" rel="noopener">${new URL(choice.url).host}</a>`;
+    }
+
+    showRandomQuote();
+    setInterval(showRandomQuote, 10000);
+  </script>
+</body>
+</html>
